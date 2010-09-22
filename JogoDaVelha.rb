@@ -4,7 +4,8 @@ class JogoDaVelha
     @jogadores = [jogador1, jogador2]
     @terminou = false
     @vencedor = 0
-    @atual = 0
+    @atual = 1
+    @jogada_atual = [-1,-1]
     @tabuleiro=[
           [" "," "," "],
           [" "," "," "],
@@ -12,33 +13,80 @@ class JogoDaVelha
   end
 
   def terminou?
-    for i in 0..1
-       #verificar linhas
-       if (verifica_linhas(@jogadores[i]))
-         @terminou=true
-         @vencedor=@jogadores[i].nome
-       end
-       #verificar colunas
-       if (verifica_colunas(@jogadores[i]))
-         @terminou=true
-         @vencedor=@jogadores[i].nome
-       end
+       x = (@jogada_atual[0].to_i) -1
+       y = (@jogada_atual[1].to_i) -1
+       #verificar linha atual
+       #verificar coluna atual
        #verificar diagonais
-       if (verifica_diagonal_1(@jogadores[i]))
+       if (verifica_linha(x,y,@jogadores[@atual].simbolo))
          @terminou=true
-         @vencedor=@jogadores[i].nome
+         @vencedor=@jogadores[@atual].nome
        end
-       if (verifica_diagonal_2(@jogadores[i]))
+       if (verifica_coluna(x,y,@jogadores[@atual].simbolo))
          @terminou=true
-         @vencedor=@jogadores[i].nome
+         @vencedor=@jogadores[@atual].nome
        end
+       if (verifica_diagonal_1(x,y,@jogadores[@atual].simbolo))
+         @terminou=true
+         @vencedor=@jogadores[@atual].nome
+       end
+       if (verifica_diagonal_2(x,y,@jogadores[@atual].simbolo))
+         @terminou=true
+         @vencedor=@jogadores[@atual].nome
+       end
+
        #verificar cheio
-       if (cheio?)
+       if (!@terminou && cheio?)
          @terminou=true
          @vencedor="A velha"
        end
-    end
     @terminou
+  end
+
+  def verifica_linha (x, y, simbolo)
+     resultado=true
+     for i in 0..2
+       if @tabuleiro[x][i]!=simbolo
+          resultado=false
+       end
+     end
+     resultado
+  end
+
+  def verifica_coluna (x, y, simbolo)
+     resultado=true
+     for i in 0..2
+       if @tabuleiro[i][y]!=simbolo
+          resultado=false
+       end
+     end
+     resultado
+  end
+
+  def verifica_diagonal_1 (x, y, simbolo)
+     if (x!=y)
+       return false
+     end
+     resultado=true
+     for i in 0..2
+       if @tabuleiro[i][i]!=simbolo
+          resultado=false
+       end
+     end
+     resultado
+  end
+
+  def verifica_diagonal_2 (x, y, simbolo)
+     if ((x+y)!=2)
+       return false
+     end
+     resultado=true
+     for i in 0..2
+       if @tabuleiro[2-i][i]!=simbolo
+          resultado=false
+       end
+     end
+     resultado
   end
 
   def cheio?
@@ -52,76 +100,26 @@ class JogoDaVelha
     true
   end
 
-  def verifica_linhas(jogador)
-    for i in 0..2
-      resultado = true
-      for j in 0..2
-         if @tabuleiro[i][j]!=jogador.simbolo
-           resultado = false
-         end
-      end
-      if (resultado)
-        return resultado
-      end 
-    end
-    return resultado
-  end
-
-  def verifica_colunas(jogador)
-    for i in 0..2
-      resultado = true
-      for j in 0..2
-         if @tabuleiro[j][i]!=jogador.simbolo
-           resultado = false
-         end
-      end
-      if (resultado)
-        return resultado
-      end 
-    end
-    return resultado
-  end
-
-  def verifica_diagonal_1(jogador)
-    for i in 0..2
-      resultado = true
-      if @tabuleiro[i][i]!=jogador.simbolo
-           resultado = false
-      end
-    end
-    resultado
-  end
-
-  def verifica_diagonal_2(jogador)
-    for i in 0..2
-      resultado = true
-      if @tabuleiro[2-i][i]!=jogador.simbolo
-           resultado = false
-      end
-    end
-    resultado
-  end
-
-
   def recebe_jogada
-    jogada = @jogadores[@atual].joga
-    while !valida?(jogada)
+    @atual = (@atual + 1) % 2
+    @jogada_atual = @jogadores[@atual].joga
+    while !valida?
       puts "Jogada inválida!"
-      jogada = @jogadores[@atual].joga
+      @jogada_atual = @jogadores[@atual].joga
     end
+    puts 
     puts @tabuleiro[0].to_s
     puts @tabuleiro[1].to_s
     puts @tabuleiro[2].to_s
-    @atual = (@atual + 1) % 2
   end
 
   def vencedor
     @vencedor
   end
 
-  def valida?(jogada)
-    x = jogada[0].to_i
-    y = jogada[1].to_i
+  def valida?
+    x = @jogada_atual[0].to_i
+    y = @jogada_atual[1].to_i
     
     if (x<1 || x>3 || y<1 || y>3)
        false
