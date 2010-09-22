@@ -1,8 +1,8 @@
 require 'Jogador'
 require 'JogoDaVelha'
 
-adolfo = Jogador.new("Adolfo")
-pedro = Jogador.new("Pedro")
+adolfo = Jogador.new("Adolfo","X")
+pedro = Jogador.new("Pedro","O")
 
 jogo = JogoDaVelha.new(adolfo,pedro)
 
