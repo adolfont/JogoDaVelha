@@ -3,7 +3,7 @@ class JogoDaVelha
   def initialize( jogador1, jogador2 )
     @jogadores = [jogador1, jogador2]
     @terminou = false
-    @vencedor = 0
+    @vencedor = nil
     @atual = 1
     @jogada_atual = [-1,-1]
     @tabuleiro=[
@@ -12,6 +12,23 @@ class JogoDaVelha
           [" "," "," "]]
   end
 
+  def recebe_jogada
+    @atual = (@atual + 1) % 2
+    @jogada_atual = @jogadores[@atual].joga
+    while !valida?
+      puts "Jogada inválida!"
+      @jogada_atual = @jogadores[@atual].joga
+    end
+    puts "Tabuleiro:"
+    puts @tabuleiro[0].to_s
+    puts @tabuleiro[1].to_s
+    puts @tabuleiro[2].to_s
+  end
+
+
+  # ANTES DE 5 JOGADAS É IMPOSSÍVEL TER UM VENCEDOR!
+  # JUNTAR OS METODOS verifica*
+  # dividir os casos para eliminar os for's
   def terminou?
        x = (@jogada_atual[0].to_i) -1
        y = (@jogada_atual[1].to_i) -1
@@ -42,6 +59,12 @@ class JogoDaVelha
        end
     @terminou
   end
+
+  def vencedor
+    @vencedor
+  end
+
+##############################################################################
 
   def verifica_linha (x, y, simbolo)
      resultado=true
@@ -100,22 +123,7 @@ class JogoDaVelha
     true
   end
 
-  def recebe_jogada
-    @atual = (@atual + 1) % 2
-    @jogada_atual = @jogadores[@atual].joga
-    while !valida?
-      puts "Jogada inválida!"
-      @jogada_atual = @jogadores[@atual].joga
-    end
-    puts 
-    puts @tabuleiro[0].to_s
-    puts @tabuleiro[1].to_s
-    puts @tabuleiro[2].to_s
-  end
 
-  def vencedor
-    @vencedor
-  end
 
   def valida?
     x = @jogada_atual[0].to_i
