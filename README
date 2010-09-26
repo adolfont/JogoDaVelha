@@ -13,3 +13,10 @@ Para executar um dos jogos exemplos, também na pasta src faça:
 Por exemplo:
 
 > ruby Main.rb ../jogos_exemplo/jogo1_1ganha.jv
+
+Foi testado em 26/09/2010 usando a seguinte versão do Ruby:
+
+ruby 1.8.6 (2010-02-05 patchlevel 399) [i386-linux]
+
+no sistema operacional "Fedora release 13 (Goddard)"
+
