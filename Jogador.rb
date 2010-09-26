@@ -4,6 +4,5 @@ class Jogador
     @nome = nome
     @simbolo = simbolo
   end
-
 end
 

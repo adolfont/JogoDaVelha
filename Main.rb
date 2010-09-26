@@ -7,7 +7,7 @@ jogador2 = Jogador.new("Pedro","O")
 begin 
   jogo = JogoDaVelha.new(jogador1,jogador2)
 
-  while !(jogo.terminou?) do
+  while not(jogo.terminou?) do
      jogo.recebe_jogada
   end
 

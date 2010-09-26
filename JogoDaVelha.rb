@@ -1,34 +1,51 @@
+# Copyleft Adolfo Neto
+# 26-09-2010
+#
+# Obs.: Este é um código escrito por alguém que está aprendendo Ruby
+# e com certa pressa.
+# Aceito sugestões para melhorias.
+
+class Jogada
+  attr_reader :linha, :coluna
+  def initialize( linha, coluna )
+    @linha = linha
+    @coluna = coluna
+  end
+end
+
+
 class JogoDaVelha
 
   def initialize( jogador1, jogador2 )
+
     @jogadores = [jogador1, jogador2]
-#TODO checar se não tem o mesmo símbolo
     if (jogador1.simbolo == jogador2.simbolo)
       raise ArgumentError, "Não são permitidos dois jogadores com o mesmo símbolo!"
     end
+
     @terminou = false
     @vencedor = nil
-    @atual = 1
-    @jogada_atual = [-1,-1]
+    @contador_de_jogadas = 1
+    @jogada_atual = Jogada.new(-1,-1)
     @tabuleiro=[
           [" "," "," "],
           [" "," "," "],
           [" "," "," "]]
   end
 
-  def recebe_jogada_nome (nome_jogador)
-    print "Digite a jogada \n(um par 'x y' com x e y entre 1 e 3) de " + nome_jogador + ": "
-    jogada = gets.split
-  end
-
   def recebe_jogada
-    @atual = (@atual + 1) % 2
-    @jogada_atual = recebe_jogada_nome(@jogadores[@atual].nome)
+    @contador_de_jogadas = @contador_de_jogadas + 1
+    jogador_da_vez = @contador_de_jogadas % 2
+    @jogada_atual = interface_recebe_jogada(@jogadores[jogador_da_vez].nome)
 
-    while !valida?
+    while !jogada_eh_valida?
       puts "Jogada inválida!"
-      @jogada_atual = recebe_jogada_nome(@jogadores[@atual].nome)
+      @jogada_atual = interface_recebe_jogada(@jogadores[jogador_da_vez].nome)
     end
+   
+    # registra a jogada no tabuleiro
+    @tabuleiro[@jogada_atual.linha][@jogada_atual.coluna]= @jogadores[jogador_da_vez].simbolo
+
     puts "Tabuleiro:"
     puts @tabuleiro[0].to_s
     puts @tabuleiro[1].to_s
@@ -36,36 +53,35 @@ class JogoDaVelha
   end
 
   # TODO:
-  # ANTES DE 5 JOGADAS É IMPOSSÍVEL TER UM VENCEDOR!
-  # JUNTAR OS METODOS verifica*
-  # dividir os casos para eliminar os for's
+  # JUNTAR OS METODOS verifica* (será mesmo necessário?)
+  # dividir os casos para eliminar os for's (será mesmo necessário?)
   def terminou?
-       x = (@jogada_atual[0].to_i) -1
-       y = (@jogada_atual[1].to_i) -1
-       #verificar linha atual
-       #verificar coluna atual
-       #verificar diagonais
-       if (verifica_linha(x,y,@jogadores[@atual].simbolo))
-         @terminou=true
-         @vencedor=@jogadores[@atual].nome
+       # antes de 5 jogadas é impossível haver um vencedor
+       if (@contador_de_jogadas < 6)
+          return false
        end
-       if (verifica_coluna(x,y,@jogadores[@atual].simbolo))
-         @terminou=true
-         @vencedor=@jogadores[@atual].nome
-       end
-       if (verifica_diagonal_1(x,y,@jogadores[@atual].simbolo))
-         @terminou=true
-         @vencedor=@jogadores[@atual].nome
-       end
-       if (verifica_diagonal_2(x,y,@jogadores[@atual].simbolo))
-         @terminou=true
-         @vencedor=@jogadores[@atual].nome
-       end
+    
+       jogador_da_vez = @contador_de_jogadas % 2
 
-       #verificar cheio
-       if (!@terminou && cheio?)
+       # após uma jogada, verificar se o símbolo colocado fecha uma linha/coluna/diagonal
+       if (  
+             verifica_linha(@jogada_atual.linha,@jogada_atual.coluna,
+			@jogadores[jogador_da_vez].simbolo) or
+             verifica_coluna(@jogada_atual.linha,@jogada_atual.coluna,
+			@jogadores[jogador_da_vez].simbolo) or
+	     verifica_diagonal_principal(@jogada_atual.linha,@jogada_atual.coluna,
+			@jogadores[jogador_da_vez].simbolo) or
+             verifica_diagonal_secundaria(@jogada_atual.linha,@jogada_atual.coluna,
+			@jogadores[jogador_da_vez].simbolo)
+	  )
          @terminou=true
-         @vencedor="A velha"
+         @vencedor=@jogadores[jogador_da_vez].nome
+       else
+         #verificar se a velha ganhou
+         if cheio?
+           @terminou=true
+           @vencedor="A velha"
+         end
        end
     @terminou
   end
@@ -75,6 +91,12 @@ class JogoDaVelha
   end
 
 ##############################################################################
+
+  def interface_recebe_jogada (nome_jogador)
+    print "Digite a jogada \n(um par 'x y' com x e y entre 1 e 3) de " + nome_jogador + ": "
+    resultado = gets.split
+    Jogada.new(resultado[0].to_i-1, resultado[1].to_i-1)
+  end
 
   def verifica_linha (x, y, simbolo)
      resultado=true
@@ -96,7 +118,7 @@ class JogoDaVelha
      resultado
   end
 
-  def verifica_diagonal_1 (x, y, simbolo)
+  def verifica_diagonal_principal (x, y, simbolo)
      if (x!=y)
        return false
      end
@@ -109,7 +131,7 @@ class JogoDaVelha
      resultado
   end
 
-  def verifica_diagonal_2 (x, y, simbolo)
+  def verifica_diagonal_secundaria (x, y, simbolo)
      if ((x+y)!=2)
        return false
      end
@@ -133,21 +155,17 @@ class JogoDaVelha
     true
   end
 
-
-
-  def valida?
-    x = @jogada_atual[0].to_i
-    y = @jogada_atual[1].to_i
-    
-    if (x<1 || x>3 || y<1 || y>3)
+  def jogada_eh_valida?
+    if (@jogada_atual.linha<0 or @jogada_atual.linha>2 or
+        @jogada_atual.coluna<0 or @jogada_atual.coluna>2)
+       # posição fora do tabuleiro    
        false
     else
-       if @tabuleiro[x-1][y-1]!=" "
+       if @tabuleiro[@jogada_atual.linha][@jogada_atual.coluna]!=" "
+          # posição ocupada
           false
        else       
-          # TODO não deveria atualizar aqui
-          @tabuleiro[x-1][y-1]= 
-              @jogadores[@atual].simbolo
+          # posição livre
           true
        end
     end
