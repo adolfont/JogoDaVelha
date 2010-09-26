@@ -2,6 +2,10 @@ class JogoDaVelha
 
   def initialize( jogador1, jogador2 )
     @jogadores = [jogador1, jogador2]
+#TODO checar se não tem o mesmo símbolo
+    if (jogador1.simbolo == jogador2.simbolo)
+      raise ArgumentError, "Não são permitidos dois jogadores com o mesmo símbolo!"
+    end
     @terminou = false
     @vencedor = nil
     @atual = 1
@@ -12,12 +16,18 @@ class JogoDaVelha
           [" "," "," "]]
   end
 
+  def recebe_jogada_nome (nome_jogador)
+    print "Digite a jogada \n(um par 'x y' com x e y entre 1 e 3) de " + nome_jogador + ": "
+    jogada = gets.split
+  end
+
   def recebe_jogada
     @atual = (@atual + 1) % 2
-    @jogada_atual = @jogadores[@atual].joga
+    @jogada_atual = recebe_jogada_nome(@jogadores[@atual].nome)
+
     while !valida?
       puts "Jogada inválida!"
-      @jogada_atual = @jogadores[@atual].joga
+      @jogada_atual = recebe_jogada_nome(@jogadores[@atual].nome)
     end
     puts "Tabuleiro:"
     puts @tabuleiro[0].to_s
@@ -25,7 +35,7 @@ class JogoDaVelha
     puts @tabuleiro[2].to_s
   end
 
-
+  # TODO:
   # ANTES DE 5 JOGADAS É IMPOSSÍVEL TER UM VENCEDOR!
   # JUNTAR OS METODOS verifica*
   # dividir os casos para eliminar os for's
@@ -135,6 +145,7 @@ class JogoDaVelha
        if @tabuleiro[x-1][y-1]!=" "
           false
        else       
+          # TODO não deveria atualizar aqui
           @tabuleiro[x-1][y-1]= 
               @jogadores[@atual].simbolo
           true

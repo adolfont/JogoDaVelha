@@ -1,13 +1,20 @@
 require 'Jogador'
 require 'JogoDaVelha'
 
-adolfo = Jogador.new("Adolfo","X")
-pedro = Jogador.new("Pedro","O")
+jogador1 = Jogador.new("Adolfo","X")
+jogador2 = Jogador.new("Pedro","O")
 
-jogo = JogoDaVelha.new(adolfo,pedro)
+begin 
+  jogo = JogoDaVelha.new(jogador1,jogador2)
 
-while !(jogo.terminou?) do
-   jogo.recebe_jogada
+  while !(jogo.terminou?) do
+     jogo.recebe_jogada
+  end
+
+  puts jogo.vencedor + " venceu"
+
+rescue ArgumentError => e
+  puts "Erro: " + e.message
 end
 
-puts jogo.vencedor + " venceu"
+
